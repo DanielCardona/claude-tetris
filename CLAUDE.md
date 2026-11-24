@@ -37,3 +37,7 @@ Three files: `index.html` (DOM: `#board` canvas, side panel with `#score`/`#line
 - Canvas size is hardcoded in `index.html` (`300 × 600`). If you change `COLS`, `ROWS` or `BLOCK`, update the `<canvas id="board">` width/height to `COLS*BLOCK × ROWS*BLOCK`. The preview uses its own fixed 30px block on a 4×4 area (`drawNext`).
 - Unpausing does not re-hide `#overlay`; `togglePause()` only removes `hidden` when pausing.
 - When game over is triggered by gravity inside `loop()`, `endGame()` cancels the current frame id but `loop()` then schedules a new frame, so the loop keeps running after game over (input is blocked by `gameOver`). Game over via hard/soft drop from the keyboard does stop it.
+
+## Theming
+
+Dark is the default; `#theme-toggle` switches to light via `document.documentElement.dataset.theme = 'light'` (persisted in `localStorage['theme']`). Colors live in CSS variables in `style.css` (`:root` / `:root[data-theme="light"]`). `setTheme()` in `game.js` reads `--grid` and `--block-shine` for canvas drawing and redraws `draw()`/`drawNext()` so it works while paused or game over.
