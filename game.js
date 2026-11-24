@@ -39,6 +39,25 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeToggle = document.getElementById('theme-toggle');
+
+let gridColor = '#22222e';
+let shineColor = 'rgba(255,255,255,0.12)';
+
+function setTheme(theme, save) {
+  const root = document.documentElement;
+  if (theme === 'light') root.dataset.theme = 'light';
+  else delete root.dataset.theme;
+  const css = getComputedStyle(root);
+  gridColor = css.getPropertyValue('--grid').trim();
+  shineColor = css.getPropertyValue('--block-shine').trim();
+  themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
+  themeToggle.textContent = theme === 'light' ? 'Modo oscuro' : 'Modo claro';
+  if (save) {
+    try { localStorage.setItem('theme', theme); } catch (e) {}
+  }
+  if (current && next) { draw(); drawNext(); }
+}
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
@@ -163,13 +182,13 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
   context.fillStyle = color;
   context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
   // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
+  context.fillStyle = shineColor;
   context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
   context.globalAlpha = 1;
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = gridColor;
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -300,5 +319,14 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+themeToggle.addEventListener('click', () => {
+  setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light', true);
+  themeToggle.blur(); // evita que Space reactive el botón
+});
+
+let savedTheme = null;
+try { savedTheme = localStorage.getItem('theme'); } catch (e) {}
+setTheme(savedTheme === 'light' ? 'light' : 'dark', false);
 
 init();
